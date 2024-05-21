@@ -38,7 +38,7 @@ import Secret from "../pages/Shared/Secret/Secret";
         },
         {
           path: 'secret',
-          element: <PrivateRoute><Secret></Secret> </PrivateRoute>
+          element: <PrivateRoute> <Secret></Secret> </PrivateRoute>
         }
       ]
     },
