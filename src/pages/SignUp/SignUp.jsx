@@ -4,10 +4,12 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
 import Swal from "sweetalert2";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
+import SocialLogin from "../../components/SocialLogin/SocialLogin";
 
 const SignUp = () => {
-  const {createUser, updateUserProfile} = useContext(AuthContext)
-  const navigate = useNavigate()
+  const { createUser, updateUserProfile } = useContext(AuthContext);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -17,26 +19,35 @@ const SignUp = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    console.log(data);
-    createUser(data.email, data.password)
-    .then(result => {
-     const logged= result.user;
-     console.log(logged);
-     updateUserProfile(data.name, data.photoURL)
-     .then(()=>{
-        console.log('user profile update');
-        reset();
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "User created Successfully",
-          showConfirmButton: false,
-          timer: 1500
-        });
-        navigate('/')
-     })
-     .catch( error => console.log(error))
-    })
+    const axiosPublic = useAxiosPublic();
+
+    createUser(data.email, data.password).then((result) => {
+      const logged = result.user;
+      console.log(logged);
+      updateUserProfile(data.name, data.photoURL)
+        .then(() => {
+          // create user entry in the database
+          const userInfo = {
+            name: data.name,
+            email: data.email,
+          };
+          axiosPublic.post("/users", userInfo).then((res) => {
+            if (res.data.insertedId) {
+              console.log("user added to the database");
+              reset();
+              Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "User created Successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+              navigate("/");
+            }
+          });
+        })
+        .catch((error) => console.log(error));
+    });
   };
   console.log(watch("example"));
 
@@ -134,11 +145,7 @@ const SignUp = () => {
                     number and spacial character{" "}
                   </span>
                 )}
-                <label className="label">
-                  <a href="#" className="label-text-alt link link-hover">
-                    Forgot password?
-                  </a>
-                </label>
+                
               </div>
               <div className="form-control mt-6">
                 <input
@@ -148,9 +155,17 @@ const SignUp = () => {
                 />
               </div>
             </form>
-            <div className="flex items-center justify-center text-center pb-4">
-            <span>Already have an account?  <Link className="text-yellow-500 font-semibold" to='/login'> Please Login </Link></span>
+            <div className="flex items-center justify-center text-center">
+              <span>
+                Already have an account?{" "}
+                <Link className="text-yellow-500 font-semibold" to="/login">
+                  {" "}
+                  Please Login{" "}
+                </Link>
+              </span>
             </div>
+            <div className="divider px-8">OR</div>
+            <SocialLogin></SocialLogin>
           </div>
         </div>
       </div>

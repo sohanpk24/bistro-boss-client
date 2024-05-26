@@ -9,6 +9,11 @@ import Login from "../pages/Login/Login";
 import SignUp from "../pages/SignUp/SignUp";
 import PrivateRoute from "./PrivateRoute";
 import Secret from "../pages/Shared/Secret/Secret";
+import Dashboard from "../layout/Dashboard";
+import Cart from "../pages/Dashboard/Cart/Cart";
+import AllUsers from "../pages/Dashboard/AllUsers/AllUsers";
+import AddItems from "../pages/Dashboard/AddItems/AddItems";
+import AdminRoute from "./AdminRoute";
 
 
  export const router = createBrowserRouter([
@@ -39,7 +44,29 @@ import Secret from "../pages/Shared/Secret/Secret";
         {
           path: 'secret',
           element: <PrivateRoute> <Secret></Secret> </PrivateRoute>
-        }
+        },
+       
       ]
     },
+    {
+      path: 'dashboard',
+      element: <PrivateRoute><Dashboard></Dashboard></PrivateRoute>,
+      children: [
+        //normal users routes
+            {
+              path: 'cart',
+              element: <Cart></Cart>
+            },
+
+            //admin only routes
+            {
+              path: 'addItems',
+              element: <AdminRoute><AddItems></AddItems></AdminRoute>
+            },
+            {
+              path: 'users',
+              element: <AdminRoute><AllUsers></AllUsers></AdminRoute>
+            }
+      ]
+    }
   ]);
